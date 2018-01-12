@@ -1,0 +1,7 @@
+*.pyc
+*.swp
+
+/.pytest_cache/
+/build/
+/logs/
+/venv/
