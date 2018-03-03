@@ -13,6 +13,11 @@ def balls(provider, state):
 
 
 @pytest.fixture()
+def reward(provider):
+    return provider.get_or_deploy_contract('RewardMock')[0]
+
+
+@pytest.fixture()
 def cbt_token(provider):
     return provider.get_or_deploy_contract('CryptoBallToken')[0]
 

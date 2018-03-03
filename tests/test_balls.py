@@ -23,15 +23,15 @@ def test_sets_balls_correctly(balls):
 def test_does_not_allow_invalid_values(balls):
     # white ball out of range
     with pytest.raises(ethereum.tester.TransactionFailed):
-        balls.transact().set(0, [29, 28, 1, 0, 3], 15);
+        balls.transact().set(0, [29, 28, 1, 0, 3], 15)
 
     # power ball out of range
     with pytest.raises(ethereum.tester.TransactionFailed):
-        balls.transact().set(0, [18, 28, 1, 0, 3], 20);
+        balls.transact().set(0, [18, 28, 1, 0, 3], 20)
 
     # duplicated white balls
     with pytest.raises(ethereum.tester.TransactionFailed):
-        balls.transact().set(0, [10, 10, 2, 3, 4], 12);
+        balls.transact().set(0, [10, 10, 2, 3, 4], 12)
 
 
 def test_returns_score_correctly(balls):
