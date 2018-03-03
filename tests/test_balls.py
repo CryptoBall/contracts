@@ -67,3 +67,23 @@ def test_refuses_to_compute_score_of_invalid_balls(chain):
 
     with pytest.raises(ethereum.tester.TransactionFailed):
         balls.call().score(0, 2)
+
+
+def test_can_actually_randomize(chain):
+    balls, _ = chain.provider.get_or_deploy_contract('BallsMock')
+    utils, _ = chain.provider.get_or_deploy_contract('Utils')
+
+    for _ in range(256):
+        utils.transact().mine()
+
+    all_balls_from_every_run = set()
+
+    for _ in range(10):
+        balls.transact().rand(0)
+        white_balls, power_ball = balls.call().show(0)
+        all_balls = tuple(sorted(white_balls) + [power_ball])
+
+        assert all_balls not in all_balls_from_every_run
+        all_balls_from_every_run.add(all_balls)
+
+    assert len(all_balls_from_every_run) == 10

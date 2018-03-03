@@ -3,10 +3,11 @@ pragma solidity ^0.4.19;
 import "../Balls.sol";
 
 
+/** @title BallsMock Contract for Testing Balls Library */
 contract BallsMock {
   using Balls for Balls.Data;
 
-  Balls.Data[5]   balls;
+  Balls.Data[5] balls;
 
 
   function show(uint idx) public view returns (uint8[5], uint8) {
