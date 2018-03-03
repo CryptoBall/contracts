@@ -2,17 +2,13 @@ import ethereum
 import pytest
 
 
-def test_shows_empty_balls_correctly(chain):
-    balls, _ = chain.provider.get_or_deploy_contract('BallsMock')
-
+def test_shows_empty_balls_correctly(balls):
     white_balls, power_ball = balls.call().show(0)
     assert white_balls == [0, 0, 0, 0, 0]
     assert power_ball == 0
 
 
-def test_sets_balls_correctly(chain):
-    balls, _ = chain.provider.get_or_deploy_contract('BallsMock')
-
+def test_sets_balls_correctly(balls):
     balls.transact().set(0, [27, 28, 1, 0, 3], 15)
     white_balls, power_ball = balls.call().show(0)
     assert white_balls == [27, 28, 1, 0, 3]
@@ -24,9 +20,7 @@ def test_sets_balls_correctly(chain):
     assert power_ball == 2
 
 
-def test_does_not_allow_invalid_values(chain):
-    balls, _ = chain.provider.get_or_deploy_contract('BallsMock')
-
+def test_does_not_allow_invalid_values(balls):
     # white ball out of range
     with pytest.raises(ethereum.tester.TransactionFailed):
         balls.transact().set(0, [29, 28, 1, 0, 3], 15);
@@ -40,9 +34,7 @@ def test_does_not_allow_invalid_values(chain):
         balls.transact().set(0, [10, 10, 2, 3, 4], 12);
 
 
-def test_returns_score_correctly(chain):
-    balls, _ = chain.provider.get_or_deploy_contract('BallsMock')
-
+def test_returns_score_correctly(balls):
     balls.transact().set(0, [1, 2, 3, 4, 5], 15)
     balls.transact().set(1, [28, 27, 26, 25, 24], 15)
     white_matches, power_match = balls.call().score(0, 1)
@@ -62,28 +54,32 @@ def test_returns_score_correctly(chain):
     assert power_match
 
 
-def test_refuses_to_compute_score_of_invalid_balls(chain):
-    balls, _ = chain.provider.get_or_deploy_contract('BallsMock')
-
+def test_refuses_to_compute_score_of_invalid_balls(balls):
     with pytest.raises(ethereum.tester.TransactionFailed):
         balls.call().score(0, 2)
 
 
-def test_can_actually_randomize(chain):
-    balls, _ = chain.provider.get_or_deploy_contract('BallsMock')
-    utils, _ = chain.provider.get_or_deploy_contract('Utils')
+def test_can_actually_randomize(state, balls):
+    state.transact().setCurrentBlockNumber(256)
+    balls.transact().rand(0)
+    white_balls, power_ball = balls.call().show(0)
+    assert white_balls == [4, 5, 19, 16, 26]
+    assert power_ball == 9
 
-    for _ in range(256):
-        utils.transact().mine()
+    state.transact().setCurrentBlockNumber(1024)
+    balls.transact().rand(0)
+    white_balls, power_ball = balls.call().show(0)
+    assert white_balls == [10, 5, 12, 28, 20]
+    assert power_ball == 5
 
-    all_balls_from_every_run = set()
+    state.transact().setCurrentBlockNumber(8192)
+    balls.transact().rand(0)
+    white_balls, power_ball = balls.call().show(0)
+    assert white_balls == [9, 8, 14, 19, 1]
+    assert power_ball == 3
 
-    for _ in range(10):
-        balls.transact().rand(0)
-        white_balls, power_ball = balls.call().show(0)
-        all_balls = tuple(sorted(white_balls) + [power_ball])
-
-        assert all_balls not in all_balls_from_every_run
-        all_balls_from_every_run.add(all_balls)
-
-    assert len(all_balls_from_every_run) == 10
+    state.transact().setCurrentBlockNumber(32768)
+    balls.transact().rand(0)
+    white_balls, power_ball = balls.call().show(0)
+    assert white_balls == [17, 9, 15, 0, 4]
+    assert power_ball == 9

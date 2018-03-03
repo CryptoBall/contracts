@@ -1,5 +1,7 @@
 pragma solidity ^0.4.19;
 
+import "./interfaces/State.sol";
+
 
 /** @title Balls Library */
 library Balls {
@@ -47,9 +49,9 @@ library Balls {
     *      See the official CryptoBall spec for details.
     * @param self The balls to mutate
     */
-  function rand(Data storage self) public {
+  function rand(Data storage self, State state) public {
     /// Gets the current block
-    uint256 currentBlock = block.number;
+    uint256 currentBlock = state.getBlockNumber();
     /// Requires at least RAND_SKIP_BLOCKS+6*BIT_PER_BALL blocks prior to
     /// the current block to generate random balls.
     require(currentBlock > RAND_SKIP_BLOCKS + 6*BIT_PER_BALL);
@@ -63,7 +65,7 @@ library Balls {
       uint256 digit = 0;
       /// Let's try all possible 256 digits
       for (; digit < 256; ++digit) {
-        uint8 randNumber = randImpl(currentBlock, digit);
+        uint8 randNumber = randImpl(currentBlock, digit, state);
         if (_i == 5) {
           if (randNumber < MAX_POWERBALL) {
             /// Only accepts power ball in range [0, MAX_POWERBALL)
@@ -154,11 +156,12 @@ library Balls {
     * @return The "random number"
     */
   function randImpl(uint256 baseBlockNumber,
-                    uint256 digit) internal view returns (uint8) {
+                    uint256 digit,
+                    State state) internal view returns (uint8) {
     uint8 result = 0;
     for (uint8 _i = 0; _i < BIT_PER_BALL; ++_i) {
       /// Gets the hash of the _i^th block
-      bytes32 hash = block.blockhash(baseBlockNumber+_i);
+      bytes32 hash = state.getBlockhash(baseBlockNumber+_i);
       /// Though possible, `hash` should never practically be zero
       assert(hash != 0);
       /// Gets the [digit/8]^th byte of the block

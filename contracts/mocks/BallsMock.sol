@@ -8,6 +8,11 @@ contract BallsMock {
   using Balls for Balls.Data;
 
   Balls.Data[5] balls;
+  State         state;
+
+  function BallsMock(address stateContract) public {
+    state = State(stateContract);
+  }
 
 
   function show(uint idx) public view returns (uint8[5], uint8) {
@@ -23,6 +28,6 @@ contract BallsMock {
   }
 
   function rand(uint idx) public {
-    balls[idx].rand();
+    balls[idx].rand(state);
   }
 }
