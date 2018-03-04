@@ -87,7 +87,7 @@ library Reward {
 
     self.hasJackpot = self.winnerCounts[1] > 0;
     if (self.hasJackpot) {
-      self.payouts[1] += self.totalJackpotFund;
+      self.payouts[1] += self.totalJackpotFund / 2;
     }
 
     for (idx = 1; idx <= TIER_COUNT; ++idx) {
@@ -107,7 +107,7 @@ library Reward {
 
   function getUnusedJackpot(Data storage self) public view returns (uint256) {
     require(self.isLocked);
-    return self.hasJackpot ? 0 : self.totalJackpotFund;
+    return self.hasJackpot ? self.totalJackpotFund / 2 : self.totalJackpotFund;
   }
 
   /// TODO
