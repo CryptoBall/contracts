@@ -6,10 +6,10 @@ import "../interfaces/State.sol";
 /** @title State Interface */
 contract StateMock is State {
 
-  /// Mocked current time
+  // Mocked current time
   uint256 currentTime;
 
-  /// Mocked current block number
+  // Mocked current block number
   uint256 currentBlockNumber;
 
   function setNow(uint256 _currentTime) public {

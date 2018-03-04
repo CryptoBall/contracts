@@ -7,19 +7,19 @@ library Reward {
   uint8 constant public TIER_COUNT = 7;
 
   struct Data {
-    /// The number of winners for each of the tiers
+    // The number of winners for each of the tiers
     uint256[8]  winnerCounts;
-    /// TODO
+    // TODO
     uint256     totalRegularFund;
-    /// TODO
+    // TODO
     uint256     totalMiniJackpotFund;
-    /// TODO
+    // TODO
     uint256     totalJackpotFund;
-    /// TODO
+    // TODO
     bool        isLocked;
-    /// TODO
+    // TODO
     bool        hasJackpot;
-    /// TODO
+    // TODO
     uint256[8]  payouts;
   }
 
