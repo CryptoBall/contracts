@@ -4,7 +4,7 @@ import pytest
 from eth_utils import to_wei
 
 
-def test_cryptoball_buy_ticket_cost(state, cryptoball):
+def test_cryptoball_buy_ticket_cost(cryptoball):
     with pytest.raises(ethereum.tester.TransactionFailed):
         cryptoball.transact().buyTicket([0, 1, 2, 3, 4], 5)
 
@@ -20,7 +20,7 @@ def test_cryptoball_buy_ticket_cost(state, cryptoball):
         'value': to_wei(0.01, 'ether')}).buyTicket([0, 1, 2, 3, 4], 5)
 
 
-def test_cryptoball_buy_ticket_value(state, cryptoball):
+def test_cryptoball_buy_ticket_value(cryptoball):
     with pytest.raises(ethereum.tester.TransactionFailed):
         cryptoball.transact({
             'value': to_wei(0.01, 'ether')}).buyTicket([0, 0, 2, 3, 4], 5)

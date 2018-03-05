@@ -1,5 +1,4 @@
 import ethereum
-import pytest
 
 
 def test_cbt_basic_functionality(cbt_token):
