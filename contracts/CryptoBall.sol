@@ -46,7 +46,7 @@ contract CryptoBall is LotteryInterface {
 
   Lottery[]   lotteries;
   Ticket[]    tickets;
-
+  uint256     nextJackpotAmount;
 
   uint256 constant REGULAR_PER_TICKET      = 0.0035 ether;
   uint256 constant MINI_JACKPOT_PER_TICKET = 0.0020 ether;
@@ -86,6 +86,10 @@ contract CryptoBall is LotteryInterface {
     ticket.state = TicketState.Open;
     ticket.owner = msg.sender;
     ticket.balls.set(whiteBalls, powerBall);
+
+    lottery.reward.addRegularFund(REGULAR_PER_TICKET);
+    lottery.reward.addMiniJackpotFund(MINI_JACKPOT_PER_TICKET);
+    nextJackpotAmount += JACKPOT_PER_TICKET;
   }
 
   /// TODO
@@ -164,5 +168,7 @@ contract CryptoBall is LotteryInterface {
     Lottery storage lottery = lotteries[nextLotteryId];
     lottery.state = LotteryState.Open;
     lottery.timeToDraw = timeToDraw;
+    lottery.reward.addJackpotFund(nextJackpotAmount);
+    nextJackpotAmount = 0;
   }
 }

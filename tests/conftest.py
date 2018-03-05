@@ -20,4 +20,3 @@ def reward(provider):
 @pytest.fixture()
 def cbt_token(provider):
     return provider.get_or_deploy_contract('CryptoBallToken')[0]
-

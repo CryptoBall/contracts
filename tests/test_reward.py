@@ -11,6 +11,17 @@ def assert_approx(expected, value):
     assert value <= 1.5 * expected
 
 
+def test_invalid_reward_tier(reward):
+    with pytest.raises(ethereum.tester.TransactionFailed):
+        reward.transact().addMultipleWinners(0, False, 1)
+
+    with pytest.raises(ethereum.tester.TransactionFailed):
+        reward.transact().addMultipleWinners(1, False, 10);
+
+    with pytest.raises(ethereum.tester.TransactionFailed):
+        reward.transact().addMultipleWinners(2, False, 100);
+
+
 def test_basic_reward(reward):
     # 2000000 Participants
     # 7000 ETH Regular Pool. 4000 ETH Mini Jackpot Pool. 4000 ETH Jackpot Pool.
