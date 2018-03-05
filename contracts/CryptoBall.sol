@@ -73,7 +73,7 @@ contract CryptoBall is LotteryInterface {
   }
 
   /// TODO
-  function buyTicket(uint8[5] whiteBalls, uint8 powerBall) public {
+  function buyTicket(uint8[5] whiteBalls, uint8 powerBall) public payable {
     require(msg.value == TICKET_COST);
 
     Lottery storage lottery = getCurrentLottery();

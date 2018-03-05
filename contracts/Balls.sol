@@ -8,7 +8,7 @@ library Balls {
   // White balls must be between [0, MAX_WHITEBALL)
   uint8 constant public MAX_WHITEBALL = 29;
   // Power balls must be between [0, MAX_POWERBALL)
-  uint8 constant public MAX_POWERBALL = 19;
+  uint8 constant public MAX_POWERBALL = 20;
   // Number of blocks to skip for generating random balls
   uint8 constant internal RAND_SKIP_BLOCKS = 200;
   // Number of bits required to generate random balls
