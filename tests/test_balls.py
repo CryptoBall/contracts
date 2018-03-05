@@ -60,25 +60,25 @@ def test_refuses_to_compute_score_of_invalid_balls(balls):
 
 
 def test_can_actually_randomize(state, balls):
-    state.transact().setCurrentBlockNumber(256)
+    state.set_block_number(256)
     balls.transact().rand(0)
     white_balls, power_ball = balls.call().show(0)
     assert white_balls == [4, 5, 19, 16, 26]
     assert power_ball == 9
 
-    state.transact().setCurrentBlockNumber(1024)
+    state.set_block_number(1024)
     balls.transact().rand(0)
     white_balls, power_ball = balls.call().show(0)
     assert white_balls == [10, 5, 12, 28, 20]
     assert power_ball == 5
 
-    state.transact().setCurrentBlockNumber(8192)
+    state.set_block_number(8192)
     balls.transact().rand(0)
     white_balls, power_ball = balls.call().show(0)
     assert white_balls == [9, 8, 14, 19, 1]
     assert power_ball == 3
 
-    state.transact().setCurrentBlockNumber(32768)
+    state.set_block_number(32768)
     balls.transact().rand(0)
     white_balls, power_ball = balls.call().show(0)
     assert white_balls == [17, 9, 15, 0, 4]

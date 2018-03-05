@@ -68,7 +68,7 @@ contract CryptoBall is LotteryInterface {
 
     state = State(stateContract);
 
-    require(firstDraw > state.getNow() + TIME_BETWEEN_DRAW);
+    require(firstDraw >= state.getNow() + TIME_BETWEEN_DRAW);
     addNextLottery(firstDraw);
   }
 
