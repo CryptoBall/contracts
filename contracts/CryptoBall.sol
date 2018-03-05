@@ -54,7 +54,7 @@ contract CryptoBall is LotteryInterface {
   uint256 constant TX_FEE_PER_TICKET       = 0.0025 ether;
   uint256 constant TICKET_COST             = 0.0100 ether;
 
-  uint256 constant TIME_CUTOFF_PURCHASE    = 3.0 hours;
+  uint256 constant TIME_CUTOFF_PURCHASE    = 2.0 hours;
   uint256 constant TIME_BETWEEN_DRAW       = 3.5 days;
   uint256 constant TIME_FOR_VERIFY         = 1.0 days;
 
