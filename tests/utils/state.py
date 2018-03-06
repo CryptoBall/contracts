@@ -7,7 +7,8 @@ class StateManager(object):
     def __init__(self, contract):
         '''Initializes the state manager based on a StateMock contract'''
         self.contract = contract
-        self.set_time(datetime.utcnow())
+        self.set_time(datetime(2017, 1, 1))
+        self.set_block_number(256)
 
     def get_address(self):
         '''Gets the underlying contract's address'''

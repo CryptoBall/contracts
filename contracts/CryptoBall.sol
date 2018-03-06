@@ -33,12 +33,12 @@ contract CryptoBall is LotteryInterface {
   }
 
   struct Lottery {
-    LotteryState  state;          // TODO
-    uint256       timeToDraw;     // TODO
+    LotteryState  state;            // TODO
+    uint256       timeToDraw;       // TODO
 
-    Ticket[]      tickets;        // TODO
-    Balls.Data    balls;          // TODO
-    Reward.Data   reward;         // TODO
+    Ticket[]      tickets;          // TODO
+    Balls.Data    balls;            // TODO
+    Reward.Data   reward;           // TODO
   }
 
 
