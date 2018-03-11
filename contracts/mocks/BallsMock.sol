@@ -19,11 +19,11 @@ contract BallsMock {
   }
 
   function score(uint idx1, uint idx2) public view returns (uint8, bool) {
-    return balls[idx1].score(balls[idx2]);
+    return balls[idx1].score(balls[idx2], state);
   }
 
   function set(uint idx, uint8[5] whiteBalls, uint8 powerBall) public {
-    balls[idx].set(whiteBalls, powerBall);
+    balls[idx].set(whiteBalls, powerBall, state);
   }
 
   function rand(uint idx) public {

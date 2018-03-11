@@ -49,49 +49,39 @@ contract CryptoBall is LotteryInterface {
   Ticket[]    tickets;
   uint256     nextJackpotAmount;
 
-  // uint256 constant REGULAR_PER_TICKET      = 0.0035 ether;
-  // uint256 constant MINI_JACKPOT_PER_TICKET = 0.0020 ether;
-  // uint256 constant JACKPOT_PER_TICKET      = 0.0020 ether;
-  // uint256 constant TX_FEE_PER_TICKET       = 0.0025 ether;
-  // uint256 constant TICKET_COST             = 0.0100 ether;
-
-  // uint256 constant TIME_CUTOFF_PURCHASE    = 2.0 hours;
-  // uint256 constant TIME_BETWEEN_DRAW       = 3.5 days;
-  // uint256 constant TIME_FOR_VERIFY         = 1.0 days;
-
 
   function CryptoBall(address stateContract,
                       uint256 firstDraw) public {
-    assert(
-      REGULAR_PER_TICKET + MINI_JACKPOT_PER_TICKET +
-      JACKPOT_PER_TICKET + TX_FEE_PER_TICKET == TICKET_COST
-    );
-
     state = State(stateContract);
 
-    require(firstDraw >= state.getNow() + TIME_BETWEEN_DRAW);
+    require(firstDraw >= state.getNow() + state.getTimeBetweenLotteries());
     addNextLottery(firstDraw);
   }
 
   /// TODO
   function buyTicket(uint8[5] whiteBalls, uint8 powerBall) public payable {
-    require(msg.value == TICKET_COST);
+    require(msg.value ==
+      state.getRegularPoolPerTicket() +
+      state.getMiniJackpotPoolPerTicket() +
+      state.getJackpotPoolPerTicket() +
+      state.getTXFeePoolPerTicket());
 
     Lottery storage lottery = getCurrentLottery();
     require(lottery.state == LotteryState.Open);
-    require(state.getNow() < lottery.timeToDraw - TIME_CUTOFF_PURCHASE);
+    require(state.getNow() <
+            lottery.timeToDraw - state.getTimeCutoffPurchase());
 
     uint256 nextTicketId = tickets.length++;
     Ticket storage ticket = tickets[nextTicketId];
 
     ticket.state = TicketState.Open;
     ticket.owner = msg.sender;
-    ticket.balls.set(whiteBalls, powerBall);
+    ticket.balls.set(whiteBalls, powerBall, state);
 
-    lottery.verifyRewardFund += TX_FEE_PER_TICKET;
-    lottery.reward.addRegularFund(REGULAR_PER_TICKET);
-    lottery.reward.addMiniJackpotFund(MINI_JACKPOT_PER_TICKET);
-    nextJackpotAmount += JACKPOT_PER_TICKET;
+    lottery.verifyRewardFund += state.getTXFeePoolPerTicket();
+    lottery.reward.addRegularFund(state.getRegularPoolPerTicket());
+    lottery.reward.addMiniJackpotFund(state.getMiniJackpotPoolPerTicket());
+    nextJackpotAmount += state.getJackpotPoolPerTicket();
   }
 
   /// TODO
@@ -104,10 +94,11 @@ contract CryptoBall is LotteryInterface {
     ticket.state = TicketState.Verified;
 
     (ticket.whiteBallMatches, ticket.powerBallMatch) =
-        lottery.balls.score(ticket.balls);
+        lottery.balls.score(ticket.balls, state);
 
     lottery.reward.addWinner(ticket.whiteBallMatches,
-                             ticket.powerBallMatch);
+                             ticket.powerBallMatch,
+                             state);
 
     // TODO: Verify Reward
   }
@@ -121,7 +112,8 @@ contract CryptoBall is LotteryInterface {
     ticket.state = TicketState.Paid;
 
     uint256 rewardAmount = lottery.reward.getPayout(ticket.whiteBallMatches,
-                                                    ticket.powerBallMatch);
+                                                    ticket.powerBallMatch,
+                                                    state);
 
     ticket.owner.transfer(rewardAmount);
   }
@@ -141,7 +133,7 @@ contract CryptoBall is LotteryInterface {
     lottery.state = LotteryState.Drawn;
     lottery.balls.rand(state);
 
-    addNextLottery(lottery.timeToDraw + TIME_BETWEEN_DRAW);
+    addNextLottery(lottery.timeToDraw + state.getTimeBetweenLotteries());
   }
 
   /// TODO
@@ -149,10 +141,11 @@ contract CryptoBall is LotteryInterface {
     Lottery storage lottery = getPreviousLottery();
 
     require(lottery.state == LotteryState.Drawn);
-    require(state.getNow() >= lottery.timeToDraw + TIME_FOR_VERIFY);
+    require(state.getNow() >=
+            lottery.timeToDraw + state.getVerifyTimePeriod());
 
     lottery.state = LotteryState.Concluded;
-    lottery.reward.computePayouts();
+    lottery.reward.computePayouts(state);
 
     Lottery storage currentLottery = getCurrentLottery();
     currentLottery.reward.addJackpotFund(lottery.reward.getUnusedJackpot());

@@ -15,8 +15,9 @@ def balls(provider, state):
 
 
 @pytest.fixture()
-def reward(provider):
-    return provider.get_or_deploy_contract('RewardMock')[0]
+def reward(provider, state):
+    return provider.get_or_deploy_contract('RewardMock',
+        deploy_args=(state.get_address(),))[0]
 
 
 @pytest.fixture()

@@ -5,14 +5,6 @@ import "./interfaces/State.sol";
 
 /** @title Balls Library */
 library Balls {
-  // White balls must be between [0, MAX_WHITEBALL)
-  uint8 constant public MAX_WHITEBALL = 29;
-  // Power balls must be between [0, MAX_POWERBALL)
-  uint8 constant public MAX_POWERBALL = 20;
-  // Number of blocks to skip for generating random balls
-  uint8 constant internal RAND_SKIP_BLOCKS = 100;
-  // Number of bits required to generate random balls
-  uint8 constant internal BIT_PER_BALL = 5;
 
   struct Data {
     // The 5 white balls. All zeroes for uninitialized balls.
@@ -33,7 +25,10 @@ library Balls {
     * @param whiteBalls An array of 5 integers representing white balls
     * @param powerBall An integer representing power ball value
     */
-  function set(Data storage self, uint8[5] whiteBalls, uint8 powerBall) public {
+  function set(Data storage self,
+               uint8[5] whiteBalls,
+               uint8 powerBall,
+               State state) public {
     // Sets white balls and power ball
     self.whiteBalls[0] = whiteBalls[0];
     self.whiteBalls[1] = whiteBalls[1];
@@ -42,7 +37,7 @@ library Balls {
     self.whiteBalls[4] = whiteBalls[4];
     self.powerBall = powerBall;
     // Checks that the new structure is valid
-    validate(self);
+    validate(self, state);
   }
 
   /** @dev Sets the given balls to "random" values based on block hashes.
@@ -54,20 +49,22 @@ library Balls {
     uint256 currentBlock = state.getBlockNumber();
     // Requires at least RAND_SKIP_BLOCKS+6*BIT_PER_BALL blocks prior to
     // the current block to generate random balls.
-    require(currentBlock > RAND_SKIP_BLOCKS + 6*BIT_PER_BALL);
-    currentBlock -= RAND_SKIP_BLOCKS;
+
+    uint8 bitPerBall = state.getBitPerBall();
+    require(currentBlock > state.getRandSkipBlocks() + 6*bitPerBall);
+    currentBlock -= state.getRandSkipBlocks();
 
     // 0 <= _i < 5 for white balls. _i = 5 for power ball.
     for (uint8 _i = 0; _i < 6; ++_i) {
       // Moves back BIT_PER_BALL blocks for a new number
-      currentBlock -= BIT_PER_BALL;
+      currentBlock -= bitPerBall;
 
       uint256 digit = 0;
       // Let's try all possible 256 digits
       for (; digit < 256; ++digit) {
         uint8 randNumber = randImpl(currentBlock, digit, state);
         if (_i == 5) {
-          if (randNumber < MAX_POWERBALL) {
+          if (randNumber < state.getMaxPowerball()) {
             // Only accepts power ball in range [0, MAX_POWERBALL)
             self.powerBall = randNumber;
             break;
@@ -81,7 +78,7 @@ library Balls {
             }
           }
 
-          if (ok && randNumber < MAX_WHITEBALL) {
+          if (ok && randNumber < state.getMaxWhiteball()) {
             // Only accepts non-dup white ball in range [0, MAX_WHITEBALL)
             self.whiteBalls[_i] = randNumber;
             break;
@@ -93,7 +90,7 @@ library Balls {
     }
 
     // Checks that the new structure is valid
-    validate(self);
+    validate(self, state);
   }
 
   /** @dev Computes the number of white ball matches and whether power ball
@@ -103,10 +100,11 @@ library Balls {
       @return Number of white matches and whether power ball matches
     */
   function score(Data storage self,
-                 Data storage other) public view returns (uint8, bool) {
+                 Data storage other,
+                 State state) public view returns (uint8, bool) {
     // Confirms that both structures are valid
-    validate(self);
-    validate(other);
+    validate(self, state);
+    validate(other, state);
     // Counts number of white ball matches
     uint8 whiteBallMatches = 0;
     for (uint8 _sIdx = 0; _sIdx < 5; ++_sIdx) {
@@ -128,16 +126,16 @@ library Balls {
   /** @dev Validates the balls struct
     * @param self The balls to validate
     */
-  function validate(Data storage self) internal view {
+  function validate(Data storage self, State state) internal view {
     for (uint8 _i = 0; _i < 5; ++_i) {
       // White balls must be less than MAX_WHITEBALL and not contain duplicate
-      require(self.whiteBalls[_i] < MAX_WHITEBALL);
+      require(self.whiteBalls[_i] < state.getMaxWhiteball());
       for (uint8 _j = 0; _j < _i; ++_j) {
         require(self.whiteBalls[_i] != self.whiteBalls[_j]);
       }
     }
     // Power ball must be less than MAX_POWERBALL
-    require(self.powerBall < MAX_POWERBALL);
+    require(self.powerBall < state.getMaxPowerball());
   }
 
   /** @dev Gets 2^power. Fails if the return result is more than 8 bits.
@@ -159,7 +157,7 @@ library Balls {
                     uint256 digit,
                     State state) internal view returns (uint8) {
     uint8 result = 0;
-    for (uint8 _i = 0; _i < BIT_PER_BALL; ++_i) {
+    for (uint8 _i = 0; _i < state.getBitPerBall(); ++_i) {
       // Gets the hash of the _i^th block
       bytes32 hash = state.getBlockhash(baseBlockNumber+_i);
       // Though possible, `hash` should never practically be zero
