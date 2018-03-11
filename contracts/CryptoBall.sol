@@ -35,6 +35,7 @@ contract CryptoBall is LotteryInterface {
   struct Lottery {
     LotteryState  state;            // TODO
     uint256       timeToDraw;       // TODO
+    uint256       verifyRewardFund; // TODO
 
     Ticket[]      tickets;          // TODO
     Balls.Data    balls;            // TODO
@@ -48,15 +49,15 @@ contract CryptoBall is LotteryInterface {
   Ticket[]    tickets;
   uint256     nextJackpotAmount;
 
-  uint256 constant REGULAR_PER_TICKET      = 0.0035 ether;
-  uint256 constant MINI_JACKPOT_PER_TICKET = 0.0020 ether;
-  uint256 constant JACKPOT_PER_TICKET      = 0.0020 ether;
-  uint256 constant TX_FEE_PER_TICKET       = 0.0025 ether;
-  uint256 constant TICKET_COST             = 0.0100 ether;
+  // uint256 constant REGULAR_PER_TICKET      = 0.0035 ether;
+  // uint256 constant MINI_JACKPOT_PER_TICKET = 0.0020 ether;
+  // uint256 constant JACKPOT_PER_TICKET      = 0.0020 ether;
+  // uint256 constant TX_FEE_PER_TICKET       = 0.0025 ether;
+  // uint256 constant TICKET_COST             = 0.0100 ether;
 
-  uint256 constant TIME_CUTOFF_PURCHASE    = 2.0 hours;
-  uint256 constant TIME_BETWEEN_DRAW       = 3.5 days;
-  uint256 constant TIME_FOR_VERIFY         = 1.0 days;
+  // uint256 constant TIME_CUTOFF_PURCHASE    = 2.0 hours;
+  // uint256 constant TIME_BETWEEN_DRAW       = 3.5 days;
+  // uint256 constant TIME_FOR_VERIFY         = 1.0 days;
 
 
   function CryptoBall(address stateContract,
@@ -87,13 +88,14 @@ contract CryptoBall is LotteryInterface {
     ticket.owner = msg.sender;
     ticket.balls.set(whiteBalls, powerBall);
 
+    lottery.verifyRewardFund += TX_FEE_PER_TICKET;
     lottery.reward.addRegularFund(REGULAR_PER_TICKET);
     lottery.reward.addMiniJackpotFund(MINI_JACKPOT_PER_TICKET);
     nextJackpotAmount += JACKPOT_PER_TICKET;
   }
 
   /// TODO
-  function verifyTicket(uint256 ticketId) public {
+  function verifyTicket(uint256 ticketId, address verifier) public {
     Lottery storage lottery = getPreviousLottery();
     Ticket storage ticket = lottery.tickets[ticketId];
 
@@ -106,6 +108,8 @@ contract CryptoBall is LotteryInterface {
 
     lottery.reward.addWinner(ticket.whiteBallMatches,
                              ticket.powerBallMatch);
+
+    // TODO: Verify Reward
   }
 
   /// TODO
@@ -118,6 +122,7 @@ contract CryptoBall is LotteryInterface {
 
     uint256 rewardAmount = lottery.reward.getPayout(ticket.whiteBallMatches,
                                                     ticket.powerBallMatch);
+
     ticket.owner.transfer(rewardAmount);
   }
 

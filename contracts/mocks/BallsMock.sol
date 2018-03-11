@@ -14,7 +14,6 @@ contract BallsMock {
     state = State(stateContract);
   }
 
-
   function show(uint idx) public view returns (uint8[5], uint8) {
     return balls[idx].show();
   }
