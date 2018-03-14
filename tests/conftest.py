@@ -3,6 +3,14 @@ from tests.utils.state import StateManager
 
 
 @pytest.fixture()
+def balance(accounts, web3):
+    web3.eth.defaultAccount = accounts[9]
+    def get_balance_impl():
+        return web3.eth.getBalance(accounts[9])
+    return get_balance_impl
+
+
+@pytest.fixture()
 def state(provider):
     state_contract = provider.get_or_deploy_contract('StateMock')[0]
     return StateManager(state_contract)
