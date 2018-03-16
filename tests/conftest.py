@@ -5,8 +5,8 @@ from tests.utils.state import StateManager
 @pytest.fixture()
 def balance(accounts, web3):
     web3.eth.defaultAccount = accounts[9]
-    def get_balance_impl():
-        return web3.eth.getBalance(accounts[9])
+    def get_balance_impl(account_id=9):
+        return web3.eth.getBalance(accounts[account_id])
     return get_balance_impl
 
 

@@ -57,7 +57,7 @@ contract StateMock is State {
   }
 
   function getVerifyTimePeriod() pure returns (uint256) {
-    return 1.0 days;
+    return 2.0 days;
   }
 
   function getMaxWhiteball() pure returns (uint8) {

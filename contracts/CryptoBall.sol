@@ -12,30 +12,30 @@ contract CryptoBall is LotteryInterface {
   using Reward for Reward.Data;
 
   enum LotteryState {
-    Open,       // TODO
-    Drawn,      // TODO
-    Concluded   // TODO
+    Open,       // Lottery is currently open for anyone to buy
+    Drawn,      // Lottery is drawn, waiting for tickets to get verified
+    Concluded   // Lottery is concluded, time to withdraw the rewards!
   }
 
   enum TicketState {
-    Open,       // TODO
-    Verified,   // TODO
-    Paid        // TODO
+    Open,       // Ticket is bought and paid, and nothing has been done since
+    Verified,   // Ticket is verified for reward
+    Paid        // Ticket reward has been paid to the buyer
   }
 
   struct Ticket {
-    TicketState   state;            // TODO
-    address       owner;            // TODO
+    TicketState   state;            // The state of this ticket
+    address       owner;            // Who bought this lottery ticket?
 
-    Balls.Data    balls;            // TODO
-    uint8         whiteBallMatches; // TODO
-    bool          powerBallMatch;   // TODO
+    Balls.Data    balls;            // The 5+1 balls associated with Ticket
+    uint8         whiteBallMatches; // Cached value
+    bool          powerBallMatch;   // Cached value
   }
 
   struct Lottery {
-    LotteryState  state;            // TODO
-    uint256       timeToDraw;       // TODO
-    uint256       verifyRewardFund; // TODO
+    LotteryState  state;            // The state of this lottery
+    uint256       timeToDraw;       // When to draw this lottery?
+    // uint256       verifyRewardFund; // TODO
 
     Ticket[]      tickets;          // TODO
     Balls.Data    balls;            // TODO
@@ -43,11 +43,11 @@ contract CryptoBall is LotteryInterface {
   }
 
 
-  State       state;
+  State       state;              // The constants state library
 
-  Lottery[]   lotteries;
-  Ticket[]    tickets;
-  uint256     nextJackpotAmount;
+  Lottery[]   lotteries;          // The list of all lotteries ever exist
+  uint256     nextJackpotAmount;  // The amount of jackpot contributing to the
+                                  // next lottery
 
 
   function CryptoBall(address stateContract,
@@ -71,14 +71,14 @@ contract CryptoBall is LotteryInterface {
     require(state.getNow() <
             lottery.timeToDraw - state.getTimeCutoffPurchase());
 
-    uint256 nextTicketId = tickets.length++;
-    Ticket storage ticket = tickets[nextTicketId];
+    uint256 nextTicketId = lottery.tickets.length++;
+    Ticket storage ticket = lottery.tickets[nextTicketId];
 
     ticket.state = TicketState.Open;
     ticket.owner = msg.sender;
     ticket.balls.set(whiteBalls, powerBall, state);
 
-    lottery.verifyRewardFund += state.getTXFeePoolPerTicket();
+    // lottery.verifyRewardFund += state.getTXFeePoolPerTicket();
     lottery.reward.addRegularFund(state.getRegularPoolPerTicket());
     lottery.reward.addMiniJackpotFund(state.getMiniJackpotPoolPerTicket());
     nextJackpotAmount += state.getJackpotPoolPerTicket();
