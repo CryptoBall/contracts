@@ -50,11 +50,8 @@ contract CryptoBall is LotteryInterface {
                                   // next lottery
 
 
-  function CryptoBall(address stateContract,
-                      uint256 firstDraw) public {
+  function CryptoBall(address stateContract, uint256 firstDraw) public {
     state = State(stateContract);
-
-    require(firstDraw >= state.getNow() + state.getTimeBetweenLotteries());
     addNextLottery(firstDraw);
   }
 
