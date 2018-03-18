@@ -16,7 +16,7 @@ contract StateMock is State {
     currentTime = _currentTime;
   }
 
-  function getNow() view returns (uint256) {
+  function getNow() public view returns (uint256) {
     return currentTime;
   }
 
@@ -24,16 +24,16 @@ contract StateMock is State {
     currentBlockNumber = _currentBlockNumber;
   }
 
-  function getBlockNumber() view returns (uint256) {
+  function getBlockNumber() public view returns (uint256) {
     return currentBlockNumber;
   }
 
-  function getBlockhash(uint256 blockNumber) view returns (bytes32) {
+  function getBlockhash(uint256 blockNumber) public view returns (bytes32) {
     return keccak256(blockNumber);
   }
 
   uint256 regularPoolPerTicket = 0.0035 ether;
-  function getRegularPoolPerTicket() view returns (uint256) {
+  function getRegularPoolPerTicket() public view returns (uint256) {
     return regularPoolPerTicket;
   }
   function setRegularPoolPerTicket(uint256 amount) returns (uint256) {
@@ -41,54 +41,54 @@ contract StateMock is State {
   }
 
   uint256 miniJackpotPoolPerTicket = 0.0020 ether;
-  function getMiniJackpotPoolPerTicket() view returns (uint256) {
+  function getMiniJackpotPoolPerTicket() public view returns (uint256) {
     return miniJackpotPoolPerTicket;
   }
   function setMiniJackpotPoolPerTicket(uint256 amount) returns (uint256) {
     return miniJackpotPoolPerTicket = amount;
   }
 
-  function getJackpotPoolPerTicket() view returns (uint256) {
+  function getJackpotPoolPerTicket() public view returns (uint256) {
     return 0.0020 ether;
   }
 
-  function getTXFeePoolPerTicket() view returns (uint256) {
+  function getTXFeePoolPerTicket() public view returns (uint256) {
     return 0.0025 ether;
   }
 
-  function getTimeCutoffPurchase() view returns (uint256) {
+  function getTimeCutoffPurchase() public view returns (uint256) {
     return 2.0 hours;
   }
 
-  function getTimeBetweenLotteries() view returns (uint256) {
+  function getTimeBetweenLotteries() public view returns (uint256) {
     return 3.5 days;
   }
 
-  function getVerifyTimePeriod() view returns (uint256) {
+  function getVerifyTimePeriod() public view returns (uint256) {
     return 2.0 days;
   }
 
-  function getMaxWhiteball() view returns (uint8) {
+  function getMaxWhiteball() public view returns (uint8) {
     return 29;
   }
 
-  function getMaxPowerball() view returns (uint8) {
+  function getMaxPowerball() public view returns (uint8) {
     return 20;
   }
 
-  function getRandSkipBlocks() view returns (uint8) {
+  function getRandSkipBlocks() public view returns (uint8) {
     return 100;
   }
 
-  function getBitPerBall() view returns (uint8) {
+  function getBitPerBall() public view returns (uint8) {
     return 5;
   }
 
-  function getTierCount() view returns (uint8) {
+  function getTierCount() public view returns (uint8) {
     return 7;
   }
 
-  function getRewardAllocation(uint8 tier) view returns (uint256) {
+  function getRewardAllocation(uint8 tier) public view returns (uint256) {
     if (tier == 1) return    0;
     if (tier == 2) return  514;
     if (tier == 3) return  578;
@@ -100,7 +100,7 @@ contract StateMock is State {
   }
 
   function getRewardTier(uint8 whiteBallMatches,
-                         bool powerBallMatch) view returns (uint8) {
+                         bool powerBallMatch) public view returns (uint8) {
     if (whiteBallMatches == 5 &&  powerBallMatch) return 1;
     if (whiteBallMatches == 5 && !powerBallMatch) return 2;
     if (whiteBallMatches == 4 &&  powerBallMatch) return 3;

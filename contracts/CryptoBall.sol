@@ -50,15 +50,30 @@ contract CryptoBall is LotteryInterface {
                                                     // the list of
                                                     // (lottoNo, ticketNo)
 
+  /** @dev Creates a brand new CryptoBall Core Contract
+    * @param stateContract The contract that dictates the lottery constants
+    * @param firstDraw The time at which the first lottery will be drawn
+    */
   function CryptoBall(address stateContract, uint256 firstDraw) public {
     state = State(stateContract);
     addNextLottery(firstDraw);
   }
 
+  //////////////////////////////////////////////////////////////////////////////
+  /// State inspectors for Cryptoball clients //////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  /** @dev Gets the total number of lotteries ever existed
+    * @return The total number lotteries
+    */
   function getLotteryCount() public view returns (uint256) {
     return lotteries.length;
   }
 
+  /** @dev TODO
+    * @param lotteryNumber TODO
+    * @return TODO
+    */
   function getLotteryInfo(uint256 lotteryNumber) public view
       returns (LotteryState, uint256, uint256, uint8[5], uint8,
                uint256, uint256, uint256[12], uint256[12]) {
@@ -76,6 +91,11 @@ contract CryptoBall is LotteryInterface {
     );
   }
 
+  /** @dev TODO
+    * @param lotteryNumber TODO
+    * @param ticketNumber TODO
+    * @return TODO
+    */
   function getTicketInfo(uint256 lotteryNumber, uint256 ticketNumber)
       public view returns (TicketState, uint8[5], uint8, address) {
     Ticket storage ticket = lotteries[lotteryNumber].tickets[ticketNumber];
@@ -87,17 +107,34 @@ contract CryptoBall is LotteryInterface {
     );
   }
 
+  /** @dev TODO
+    * @param owner TODO
+    * @return TODO
+    */
   function getTicketCountByOwner(address owner) public view returns (uint256) {
     return ticketCache[owner].length;
   }
 
+  /** @dev TODO
+    * @param owner TODO
+    * @param ticketNumber TODO
+    * @return TODO
+    */
   function getTicketByOwner(address owner, uint256 ticketNumber)
       public view returns (TicketState, uint8[5], uint8, address) {
-    uint256[2] cacheValues = ticketCache[owner][ticketNumber];
+    uint256[2] storage cacheValues = ticketCache[owner][ticketNumber];
     return getTicketInfo(cacheValues[0], cacheValues[1]);
   }
 
-  /// TODO
+
+  //////////////////////////////////////////////////////////////////////////////
+  /// Mutator methods for interacting with the contracts ///////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  /** @dev TODO
+    * @param whiteBalls TODO
+    * @param powerBall TODO
+    */
   function buyTicket(uint8[5] whiteBalls, uint8 powerBall) public payable {
     require(msg.value ==
       state.getRegularPoolPerTicket() +
@@ -123,8 +160,10 @@ contract CryptoBall is LotteryInterface {
     ticketCache[ticket.owner].push([lotteries.length - 1, nextTicketId]);
   }
 
-  /// TODO
-  function verifyTicket(uint256 ticketId, address verifier) public {
+  /** @dev TODO
+    * @param ticketId TODO
+    */
+  function verifyTicket(uint256 ticketId) public {
     Lottery storage lottery = getPreviousLottery();
     Ticket storage ticket = lottery.tickets[ticketId];
 
@@ -142,7 +181,10 @@ contract CryptoBall is LotteryInterface {
     // TODO: Verify Reward
   }
 
-  /// TODO
+  /** @dev TODO
+    * @param lotteryId TODO
+    * @param ticketId TODO
+    */
   function withdrawReward(uint256 lotteryId, uint256 ticketId) public {
     Lottery storage lottery = lotteries[lotteryId];
     Ticket storage ticket = lottery.tickets[ticketId];
@@ -157,7 +199,8 @@ contract CryptoBall is LotteryInterface {
     ticket.owner.transfer(rewardAmount);
   }
 
-  /// TODO
+  /** @dev TODO
+    */
   function drawLottery() public {
     if (lotteries.length > 1 &&
         lotteries[lotteries.length - 2].state != LotteryState.Concluded) {
@@ -175,7 +218,8 @@ contract CryptoBall is LotteryInterface {
     addNextLottery(lottery.timeToDraw + state.getTimeBetweenLotteries());
   }
 
-  /// TODO
+  /** @dev TODO
+    */
   function concludeLottery() public {
     Lottery storage lottery = getPreviousLottery();
 
@@ -190,12 +234,16 @@ contract CryptoBall is LotteryInterface {
     currentLottery.reward.addJackpotFund(lottery.reward.getUnusedJackpot());
   }
 
-  /// TODO
-  function getPreviousLottery() internal returns (Lottery storage) {
+
+  //////////////////////////////////////////////////////////////////////////////
+  /// Internal methods /////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  function getPreviousLottery() internal view returns (Lottery storage) {
     return lotteries[lotteries.length - 2];
   }
 
-  function getCurrentLottery() internal returns (Lottery storage) {
+  function getCurrentLottery() internal view returns (Lottery storage) {
     return lotteries[lotteries.length - 1];
   }
 
