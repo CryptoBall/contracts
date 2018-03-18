@@ -5,3 +5,6 @@
 /build/
 /logs/
 /venv/
+
+/registrar.json
+/project.json
