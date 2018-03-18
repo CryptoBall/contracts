@@ -3,49 +3,26 @@ pragma solidity ^0.4.19;
 import "../interfaces/State.sol";
 
 
-/** @title State Interface */
-contract StateMock is State {
-
-  // Mocked current time
-  uint256 currentTime;
-
-  // Mocked current block number
-  uint256 currentBlockNumber;
-
-  function setNow(uint256 _currentTime) {
-    currentTime = _currentTime;
-  }
+contract StateImpl is State {
 
   function getNow() view returns (uint256) {
-    return currentTime;
-  }
-
-  function setCurrentBlockNumber(uint256 _currentBlockNumber) {
-    currentBlockNumber = _currentBlockNumber;
+    return now;
   }
 
   function getBlockNumber() view returns (uint256) {
-    return currentBlockNumber;
+    return block.number;
   }
 
   function getBlockhash(uint256 blockNumber) view returns (bytes32) {
-    return keccak256(blockNumber);
+    return block.blockhash(blockNumber);
   }
 
-  uint256 regularPoolPerTicket = 0.0035 ether;
   function getRegularPoolPerTicket() view returns (uint256) {
-    return regularPoolPerTicket;
-  }
-  function setRegularPoolPerTicket(uint256 amount) returns (uint256) {
-    return regularPoolPerTicket = amount;
+    return 0.0035 ether;
   }
 
-  uint256 miniJackpotPoolPerTicket = 0.0020 ether;
   function getMiniJackpotPoolPerTicket() view returns (uint256) {
-    return miniJackpotPoolPerTicket;
-  }
-  function setMiniJackpotPoolPerTicket(uint256 amount) returns (uint256) {
-    return miniJackpotPoolPerTicket = amount;
+    return 0.0020 ether;
   }
 
   function getJackpotPoolPerTicket() view returns (uint256) {

@@ -10,28 +10,28 @@ contract State {
   function getBlockhash(uint256 blockNumber) view returns (bytes32);
 
   /// Cryptoball core constants
-  function getRegularPoolPerTicket() pure returns (uint256);
-  function getMiniJackpotPoolPerTicket() pure returns (uint256);
-  function getJackpotPoolPerTicket() pure returns (uint256);
-  function getTXFeePoolPerTicket() pure returns (uint256);
+  function getRegularPoolPerTicket() view returns (uint256);
+  function getMiniJackpotPoolPerTicket() view returns (uint256);
+  function getJackpotPoolPerTicket() view returns (uint256);
+  function getTXFeePoolPerTicket() view returns (uint256);
 
-  function getTimeCutoffPurchase() pure returns (uint256);
-  function getTimeBetweenLotteries() pure returns (uint256);
-  function getVerifyTimePeriod() pure returns (uint256);
+  function getTimeCutoffPurchase() view returns (uint256);
+  function getTimeBetweenLotteries() view returns (uint256);
+  function getVerifyTimePeriod() view returns (uint256);
 
   /// Balls library constants
   /// White balls must be between [0, MAX_WHITEBALL)
-  function getMaxWhiteball() pure returns (uint8);
+  function getMaxWhiteball() view returns (uint8);
   /// Power balls must be between [0, MAX_POWERBALL)
-  function getMaxPowerball() pure returns (uint8);
+  function getMaxPowerball() view returns (uint8);
   /// Number of blocks to skip for generating random balls
-  function getRandSkipBlocks() pure returns (uint8);
+  function getRandSkipBlocks() view returns (uint8);
   /// Number of bits required to generate random balls
-  function getBitPerBall() pure returns (uint8);
+  function getBitPerBall() view returns (uint8);
 
   /// Rewards library constants
-  function getTierCount() pure returns (uint8);
-  function getRewardAllocation(uint8 tier) pure returns (uint256);
+  function getTierCount() view returns (uint8);
+  function getRewardAllocation(uint8 tier) view returns (uint256);
   function getRewardTier(uint8 whiteBallMatches,
-                         bool powerBallMatch) pure returns (uint8);
+                         bool powerBallMatch) view returns (uint8);
 }

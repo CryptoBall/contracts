@@ -5,34 +5,31 @@ import "./interfaces/State.sol";
 
 /** @title Reward Library */
 library Reward {
-
   struct Data {
     // The number of winners for each of the tiers
-    uint256[8]  winnerCounts;
-    // TODO
+    uint256[12] winnerCounts;
+    // The total amount of regular fund collected
     uint256     totalRegularFund;
-    // TODO
+    // The total amount of mini-jackpot fund collected
     uint256     totalMiniJackpotFund;
-    // TODO
+    // The total amount of jackpot fund collected (subject to rollover)
     uint256     totalJackpotFund;
-    // TODO
+    // The total amount of TX fee collected
+    uint256     totalTXFeeFund;
+    // If the reward is locked, no more mutation will ever be allowed
     bool        isLocked;
-    // TODO
+    // Whether there's a jackpot in this round!
     bool        hasJackpot;
-    // TODO
-    uint256[8]  payouts;
+    // The amount of payout per winning for each of the tiers
+    uint256[12] payouts;
   }
 
   /// TODO
-  function addRegularFund(Data storage self, uint256 amount) public {
+  function addNonJackpotFund(Data storage self, State state) public {
     require(!self.isLocked);
-    self.totalRegularFund += amount;
-  }
-
-  /// TODO
-  function addMiniJackpotFund(Data storage self, uint256 amount) public {
-    require(!self.isLocked);
-    self.totalMiniJackpotFund += amount;
+    self.totalRegularFund += state.getRegularPoolPerTicket();
+    self.totalMiniJackpotFund += state.getMiniJackpotPoolPerTicket();
+    self.totalTXFeeFund += state.getTXFeePoolPerTicket();
   }
 
   /// TODO

@@ -26,7 +26,6 @@ contract CryptoBall is LotteryInterface {
   struct Ticket {
     TicketState   state;            // The state of this ticket
     address       owner;            // Who bought this lottery ticket?
-
     Balls.Data    balls;            // The 5+1 balls associated with Ticket
     uint8         whiteBallMatches; // Cached value
     bool          powerBallMatch;   // Cached value
@@ -35,11 +34,9 @@ contract CryptoBall is LotteryInterface {
   struct Lottery {
     LotteryState  state;            // The state of this lottery
     uint256       timeToDraw;       // When to draw this lottery?
-    // uint256       verifyRewardFund; // TODO
-
-    Ticket[]      tickets;          // TODO
-    Balls.Data    balls;            // TODO
-    Reward.Data   reward;           // TODO
+    Ticket[]      tickets;          // The list of tickets in the lottery
+    Balls.Data    balls;            // Picked white balls and power ball
+    Reward.Data   reward;           // Reward computation
   }
 
 
@@ -49,10 +46,55 @@ contract CryptoBall is LotteryInterface {
   uint256     nextJackpotAmount;  // The amount of jackpot contributing to the
                                   // next lottery
 
+  mapping (address => uint256[2][])   ticketCache;  // Mapping from owner to
+                                                    // the list of
+                                                    // (lottoNo, ticketNo)
 
   function CryptoBall(address stateContract, uint256 firstDraw) public {
     state = State(stateContract);
     addNextLottery(firstDraw);
+  }
+
+  function getLotteryCount() public view returns (uint256) {
+    return lotteries.length;
+  }
+
+  function getLotteryInfo(uint256 lotteryNumber) public view
+      returns (LotteryState, uint256, uint256, uint8[5], uint8,
+               uint256, uint256, uint256[12], uint256[12]) {
+    Lottery storage lottery = lotteries[lotteryNumber];
+    return (
+      lottery.state,
+      lottery.timeToDraw,
+      lottery.tickets.length,
+      lottery.balls.whiteBalls,
+      lottery.balls.powerBall,
+      lottery.reward.totalMiniJackpotFund,
+      lottery.reward.totalJackpotFund,
+      lottery.reward.winnerCounts,
+      lottery.reward.payouts
+    );
+  }
+
+  function getTicketInfo(uint256 lotteryNumber, uint256 ticketNumber)
+      public view returns (TicketState, uint8[5], uint8, address) {
+    Ticket storage ticket = lotteries[lotteryNumber].tickets[ticketNumber];
+    return (
+      ticket.state,
+      ticket.balls.whiteBalls,
+      ticket.balls.powerBall,
+      ticket.owner
+    );
+  }
+
+  function getTicketCountByOwner(address owner) public view returns (uint256) {
+    return ticketCache[owner].length;
+  }
+
+  function getTicketByOwner(address owner, uint256 ticketNumber)
+      public view returns (TicketState, uint8[5], uint8, address) {
+    uint256[2] cacheValues = ticketCache[owner][ticketNumber];
+    return getTicketInfo(cacheValues[0], cacheValues[1]);
   }
 
   /// TODO
@@ -75,10 +117,10 @@ contract CryptoBall is LotteryInterface {
     ticket.owner = msg.sender;
     ticket.balls.set(whiteBalls, powerBall, state);
 
-    // lottery.verifyRewardFund += state.getTXFeePoolPerTicket();
-    lottery.reward.addRegularFund(state.getRegularPoolPerTicket());
-    lottery.reward.addMiniJackpotFund(state.getMiniJackpotPoolPerTicket());
+    lottery.reward.addNonJackpotFund(state);
     nextJackpotAmount += state.getJackpotPoolPerTicket();
+
+    ticketCache[ticket.owner].push([lotteries.length - 1, nextTicketId]);
   }
 
   /// TODO

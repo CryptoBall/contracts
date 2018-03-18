@@ -14,12 +14,12 @@ contract RewardMock {
     state = State(stateContract);
   }
 
-  function addFunds(uint256 regularFund,
-                    uint256 miniJackpotFund,
-                    uint256 jackpotFund) public {
-    reward.addRegularFund(regularFund);
-    reward.addMiniJackpotFund(miniJackpotFund);
-    reward.addJackpotFund(jackpotFund);
+  function addNonJackpotFund() public {
+    reward.addNonJackpotFund(state);
+  }
+
+  function addJackpotFund(uint256 amount) public {
+    reward.addJackpotFund(amount);
   }
 
   function addMultipleWinners(uint8 whiteBallMatches,

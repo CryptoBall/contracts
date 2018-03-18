@@ -22,12 +22,14 @@ def test_invalid_reward_tier(reward):
         reward.transact().addMultipleWinners(2, False, 100);
 
 
-def test_basic_reward(reward):
+def test_basic_reward(reward, state):
     # 2000000 Participants
     # 7000 ETH Regular Pool. 4000 ETH Mini Jackpot Pool. 4000 ETH Jackpot Pool.
-    reward.transact().addFunds(to_wei(7000, 'ether'),
-                               to_wei(4000, 'ether'),
-                               to_wei(4000, 'ether'))
+    state.contract.transact().setRegularPoolPerTicket(to_wei(7000, 'ether'))
+    state.contract.transact().setMiniJackpotPoolPerTicket(to_wei(4000, 'ether'))
+    reward.transact().addNonJackpotFund()
+    reward.transact().addJackpotFund(to_wei(4000, 'ether'))
+
     reward.transact().addMultipleWinners(0, True, 35000)
     reward.transact().addMultipleWinners(1, True, 44000)
     reward.transact().addMultipleWinners(2, True, 17000)
@@ -51,12 +53,14 @@ def test_basic_reward(reward):
     assert_approx(reward.call().getPayout(5, True), to_wei(6000, 'ether'))
 
 
-def test_without_big_jackpot(reward):
+def test_without_big_jackpot(reward, state):
     # 100000 Participants
     # 350 ETH Regular Pool. 200 ETH Mini Jackpot Pool. 200 ETH Jackpot Pool.
-    reward.transact().addFunds(to_wei(350, 'ether'),
-                               to_wei(200, 'ether'),
-                               to_wei(200, 'ether'))
+    state.contract.transact().setRegularPoolPerTicket(to_wei(350, 'ether'))
+    state.contract.transact().setMiniJackpotPoolPerTicket(to_wei(200, 'ether'))
+    reward.transact().addNonJackpotFund()
+    reward.transact().addJackpotFund(to_wei(200, 'ether'))
+
     reward.transact().addMultipleWinners(0, True, 1700)
     reward.transact().addMultipleWinners(1, True, 2200)
     reward.transact().addMultipleWinners(2, True, 800)
@@ -80,12 +84,14 @@ def test_without_big_jackpot(reward):
     assert_approx(reward.call().getPayout(5, True), to_wei(0, 'ether'))
 
 
-def test_even_with_lower_players(reward):
+def test_even_with_lower_players(reward, state):
     # 10000 Participants
     # 35 ETH Regular Pool. 20 ETH Mini Jackpot Pool. 20 ETH Jackpot Pool.
-    reward.transact().addFunds(to_wei(35, 'ether'),
-                               to_wei(20, 'ether'),
-                               to_wei(20, 'ether'))
+    state.contract.transact().setRegularPoolPerTicket(to_wei(35, 'ether'))
+    state.contract.transact().setMiniJackpotPoolPerTicket(to_wei(20, 'ether'))
+    reward.transact().addNonJackpotFund()
+    reward.transact().addJackpotFund(to_wei(20, 'ether'))
+
     reward.transact().addMultipleWinners(0, True, 170)
     reward.transact().addMultipleWinners(1, True, 220)
     reward.transact().addMultipleWinners(2, True, 80)
