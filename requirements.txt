@@ -48,4 +48,4 @@ virtualenv==15.1.0
 virtualenv-clone==0.3.0
 watchdog==0.8.3
 web3==3.16.5
-Werkzeug==0.14.1
+Werkzeug==0.15.3
